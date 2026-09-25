@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 import userRoutes from "./Routes/userRouter.js";
-
+import error from "./Middleware/error.js";
 
 dotenv.config();
 
@@ -15,6 +15,7 @@ app.use(cors());
 
 app.use(express.json());
 
+app.use(error);
 
 app.get('/',(req, res)=>{
     res.send(`Backend is working on the this ${PORT}`);

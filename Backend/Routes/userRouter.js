@@ -23,12 +23,17 @@ router.post("/", async (req, res, next) => {
 
     try {
         const result = await pool.query(
-            "SELECT * FROM users WHERE email = $1",
-            [email]
+            "SELECT id, email FROM users WHERE id = $1 OR email = $2",
+            [id, email]
         );
-        if (result.rows.length > 0) {
+        if (result.rows.some((user) => String(user.id) === String(id))) {
             return res.status(409).json({
-                message: "User already exists"
+                message: "This ID already exists. Please use a valid ID."
+            });
+        }
+        if (result.rows.some((user) => user.email === email)) {
+            return res.status(409).json({
+                message: "This email is already registered."
             });
         }
 
