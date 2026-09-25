@@ -64,7 +64,29 @@ router.delete('/:id', async (req, res, next)=>{
     }
 });
 
+// find id 
 
+router.get("/:id", async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query(
+            "SELECT * FROM users WHERE id = $1",
+            [id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        res.json(result.rows[0]);
+
+    } catch (error) {
+        next(error);
+    }
+});
 
 
 router.put('/:id', async (req, res, next )=>{
@@ -72,7 +94,7 @@ router.put('/:id', async (req, res, next )=>{
     const {name, email, phone, address, age } = req.body;
     try{
         const result = await pool.query(
-            "UPDATE users SET name = $1, email =$2 , phone = $3 , address = $4, age = $5 *",
+            "UPDATE users SET name = $1, email = $2, phone = $3, address = $4, age = $5 WHERE id = $6 RETURNING *",
             [name, email, phone, address, age, id] 
         );
         if (result.rows.length === 0){
@@ -84,7 +106,7 @@ router.put('/:id', async (req, res, next )=>{
 
         res.json({
             message:"user updated",
-            user:result. row[0]
+            user:result.rows[0]
             
         });
     }catch(error){
@@ -92,4 +114,4 @@ router.put('/:id', async (req, res, next )=>{
     }
 });
 
-export default Router;
+export default router;
